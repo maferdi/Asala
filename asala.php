@@ -61,7 +61,22 @@ $descTodos = $_POST['descTodos'];
 $vtituloCurto = substr("$vtitulo", 0, 15); 
 $tituloCurto = "$vtituloCurto...";
 
+$chunkly = $_POST['fileupload']
 
+if($chunkly == 'chunklyimage' > 0 && ($vuser == $vdono)){
+    $file_path = "usermedia/" . $onome;
+    if ($file_path !== 0) {
+  $sqlxx="UPDATE salas SET imgx='/" . mysqli_real_escape_string($con, $file_path) . "' WHERE tag='" . mysqli_real_escape_string($con, $onome) . "'";
+        $resxx=mysqli_query($con,$sqlxx);
+    }
+}
+if($chunkly == 'chunklyvideo' > 0 && ($vuser == $vdono)){
+    $file_path = "usermedia/" . $onome;
+    if ($file_path !== 0) {
+        $sqlxx="UPDATE salas SET vid='/" . mysqli_real_escape_string($con, $file_path) . "', media_uploaded_at=now(), vid_begins_at=0, vid_status=true WHERE tag='" . mysqli_real_escape_string($con, $onome) . "'";
+        $resxx=mysqli_query($con,$sqlxx);
+    }
+}
 //
 //--- QUANDO O DONO DELETAR A SUA SALA ----
 //
@@ -585,10 +600,10 @@ if($vrank > 2){
 
 <?php 
 if($vuser == $vdono){
-include "fileupload.php"; //<!--M3-->
+include "fileupload.php";
    
-$imageFile = $_FILES["imageUpload"]; //<!--M3-->
-$videoFile = $_FILES["videoUpload"]; //<!--M3-->
+$imageFile = $_FILES["imageUpload"];
+$videoFile = $_FILES["videoUpload"];
 
 $retire = $_POST['retire'];
 
@@ -628,9 +643,8 @@ $resm=mysqli_query($con,$sqlm);
 //EXIBINDO IMAGEM NA SALA POR MEIO DO UPLOAD
 //
 if(count($imageFile) > 0 && ($vuser == $vdono)){
-echo 'WILL START MY NEW UPLOAD';
-$file_path = uploadFile($_POST, $_FILES, "imageUpload", $onome);
-echo 'WILL FINISH MY NEW UPLOAD WITH ' . $file_path .' AS FILE PATH';
+//$file_path = uploadFile($_POST, $_FILES, "imageUpload", $onome);
+$file_path = "usermedia/" . $onome; //<!--M-CHUNKLY-->
 if ($file_path !== 0) {
   echo 'FILEPATH IS NOT NULL.';
   $sqlxx="UPDATE salas SET imgx='/" . mysqli_real_escape_string($con, $file_path) . "' WHERE tag='" . mysqli_real_escape_string($con, $onome) . "'";
@@ -642,11 +656,11 @@ if ($file_path !== 0) {
 <?php
 }
 
-if(count($videoFile) > 0 && ($vuser == $vdono)){//<!--M3-->
-$file_path = uploadFile($_POST, $_FILES, "videoUpload", $onome); //<!--M3-->
+if(count($videoFile) > 0 && ($vuser == $vdono)){
+$file_path = uploadFile($_POST, $_FILES, "videoUpload", $onome);
 if ($file_path !== 0) {
     $sqlxx="UPDATE salas SET vid='/" . mysqli_real_escape_string($con, $file_path) . "', media_uploaded_at=now(), vid_begins_at=0, vid_status=true WHERE tag='" . mysqli_real_escape_string($con, $onome) . "'";
-    $resxx=mysqli_query($con,$sqlxx); //<!--M3-->
+    $resxx=mysqli_query($con,$sqlxx);
 }
 }
 }
@@ -747,42 +761,7 @@ if($vuser == $vdono){
 <?php
  if($vimg == $zero){
 ?>
-   
-<!--M3 SUBSTITUIDO
-<form name="form1" action="" method="post">
-<div class="form-group basic">
-<div class="input-wrapper">
-<label class="label" for="name3">
-  Envie uma imagem online por URL.
-</label>
-<input type="text" name="ourl" autocorrect="off" autocapitalize="off" spellcheck="false" data-gramm="false" autocomplete="off" maxlength="280" class="form-control" id="name3" placeholder="https://www..." required="">         
-  <i class="clear-input">
-   <ion-icon name="close-circle"></ion-ico>
-  </i>
-</div>
-</div>
 
-<div class="custom-control custom-checkbox mb-1">
- <input type="checkbox" class="custom-control-input" id="customCheckb99" required="">
-  <label class="custom-control-label" for="customCheckb99" style="line-height: 1rem; font-size: 13px;">
-  A imagem está de acordo com  os <a href="#" data-toggle="modal" data-target="#PanelRight">
-    Termos de Uso</a> e <a href="#" data-toggle="modal" data-target="#PanelLeft">Política de Privacidade</a>.
-  </label>
- </input>          
-</div>
-  
-<input type="hidden" value='<?php echo "$vuser"; ?>' name="ouser"></input>
-  <br>
-  <div class="form-group basic">
-  <button type="submit" class="btn btn-secondary btn-block btn-lg">
-      Exibir
-  </button>
-  </div>
-                                
-</form>
--->
-
-<!--M3 BEGINS-->
 <form name="form1" action="" method="post" enctype="multipart/form-data"> 
 <div class="form-group basic">
 <div class="input-wrapper">
@@ -803,12 +782,11 @@ if($vuser == $vdono){
 </div>
 <input type="hidden" value='<?php echo "$vuser"; ?>' name="ouser"></input>
   <div class="form-group basic">
-  <button type="submit" value="Upload" class="btn btn-secondary btn-block btn-lg">
+  <button type="submit" value="Upload" id="img-up" class="btn btn-secondary btn-block btn-lg"> <!--M-CHUNKLY-->
       Exibir Imagem
   </button>
   </div>
 </form>
-<!--M3 ENDS-->
 
 <?php
 }else{
@@ -845,7 +823,7 @@ if($vuser == $vdono){
 	action=""
 	method="post"
 	enctype="multipart/form-data"
-	id="vid-form"> <!--M5-->
+	id="vid-form">
 <div class="form-group basic">
 <div class="input-wrapper">
 <label class="label" for="name3">
@@ -856,16 +834,16 @@ if($vuser == $vdono){
    <i class="clear-input">
     <ion-icon name="close-circle"></ion-icon>
    </i>
-			<div id="vid-prog" class="progress active" style="height: 5px; display: none;"> <!--M5-->
-				<div id="vid-prog-bar" class="progress-bar btn-primary" style="width: 0%;"></div> <!--M5-->
-			</div> <!--M5-->
+	<div id="vid-prog" class="progress active" style="height: 5px; display: none;">
+		<div id="vid-prog-bar" class="progress-bar btn-primary" style="width: 0%;"></div>
+	</div>
  </div>
 </div>
 
 <center>
 
 <div class="form-group basic">
-<button type="submit" value="Upload" class="btn btn-primary" style="width: 55%">
+<button id="vid-up" type="submit" value="Upload" class="btn btn-primary" style="width: 55%"> <!--M-CHUNKLY-->
      INICIAR TRANSMISSÃO
 </button>
 <a href="../../../pag/ent/nv.php" target="_parent" class="btn btn-secondary" style="width: 30%">
@@ -879,42 +857,9 @@ if($vuser == $vdono){
  </label>
 
 </center>
-<!--M3-ENDS-->
 
 <input type="hidden" value='<?php echo "$vuser"; ?>' name="ouser"></input>
   
-<!--M5 STARTS-->
-<script>
-    var bar = document.getElementById('vid-prog-bar');
-    $('#vid-form').submit(function(e) {
-        e.preventDefault();
-        document.getElementById('vid-prog').style.display = 'block';
-        $.ajax({
-            url: location.href,
-            type: 'post',
-            enctype: 'multipart/form-data',
-            data: new FormData(document.getElementById('vid-form')),
-            processData: false,
-            contentType: false,            
-            xhr: function() {
-                var xhr = new window.XMLHttpRequest();
-                xhr.upload.addEventListener("progress", function(evt) {
-                    if (evt.lengthComputable) {
-                        var percentComplete = (evt.loaded / evt.total) * 100;
-				        bar.style = 'width: ' + percentComplete + '%;';
-                    }
-               }, false);
-               return xhr;
-            },
-			success: function() {
-				bar.style = 'width: 100%;';
-                window.location = window.location.href;
-			}
-        });
-    });
-</script>
-<!--M5 ENDS-->
-
 <?php
 }else{
 ?>
@@ -936,6 +881,88 @@ Encerrar Transmissão
 <?php  
 }
 ?>
+
+<!-- SCRIPTS-CHUNKLY-UPLOAD-BEGIN -->
+<script src="assets/js/lib/plupload.full.min.js"></script>
+<script>
+
+function finishUpload(filetype) {
+    var url = window.location.href;
+    var params = "fileupload=chunkly" + filetype;
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhr.send(params);
+
+    location.reload();
+}
+
+var bar = document.getElementById('vid-prog-bar');
+window.addEventListener("load", function () {
+  var uploader = new plupload.Uploader({
+    runtimes: 'html5,html4',
+    browse_button: 'vid-up',
+    url: 'mediaupload.php',
+    chunk_size: '10mb',
+    filters: {
+      max_file_size: '2000mb', mime_types: [{title: "Video files", extensions: "avi,mp4,mkv,mov"}]
+    },
+    init: {
+      PostInit: function () {
+        document.getElementById('vid-prog').style.display = 'block';
+      },
+      FilesAdded: function (up, files) {
+        uploader.start();
+      },
+      UploadProgress: function (up, file) {
+        bar.style = 'width: ' + file.percent + '%;';
+      },
+      Error: function (up, err) {
+        console.log(err);
+      },
+      FileUploaded: function(up, file, response) {
+        console.log('Yay');
+        finishUpload('video');
+      }
+    }
+  });
+  uploader.init();
+});
+
+window.addEventListener("load", function () {
+  var uploader = new plupload.Uploader({
+    runtimes: 'html5,html4',
+    browse_button: 'img-up',
+    url: 'mediaupload.php',
+    chunk_size: '10mb',
+    filters: {
+      max_file_size: '2000mb', mime_types: [{title: "Image files", extensions: "jpg,gif,png,webp,bmp"}]
+    },
+    init: {
+      PostInit: function () {
+        console.log('Starting img upload...');
+      },
+      FilesAdded: function (up, files) {
+        uploader.start();
+      },
+      UploadProgress: function (up, file) {
+        console.log('Img upload at...');
+      },
+      Error: function (up, err) {
+        console.log(err);
+      },
+      FileUploaded: function(up, file, response) {
+        console.log('Yay');
+        finishUpload('image');
+      }
+    }
+  });
+  uploader.init();
+});
+</script>
+<!-- SCRIPTS-CHUNKLY-UPLOAD-END -->
+   
 </div>
 </div>
 </div>
